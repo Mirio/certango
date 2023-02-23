@@ -1,0 +1,53 @@
+version: '3'
+
+volumes:
+  certango_local_postgres_data: {}
+  certango_local_postgres_data_backups: {}
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: certango_local_django
+    container_name: certango_local_django
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app:z
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - "8000:8000"
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: certango_production_postgres
+    container_name: certango_local_postgres
+    volumes:
+      - certango_local_postgres_data:/var/lib/postgresql/data
+      - certango_local_postgres_data_backups:/backups
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.envs/.local/.postgres
+
+  docs:
+    image: certango_local_docs
+    container_name: certango_local_docs
+    build:
+      context: .
+      dockerfile: ./compose/local/docs/Dockerfile
+    env_file:
+      - ./.envs/.local/.django
+    volumes:
+      - ./docs:/docs:z
+      - ./config:/app/config:z
+      - ./certango:/app/certango:z
+    ports:
+      - "9000:9000"
+    command: /start-docs

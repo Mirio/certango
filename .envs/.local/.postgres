@@ -1,8 +1,8 @@
 # PostgreSQL
 # ------------------------------------------------------------------------------
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5432
-POSTGRES_DB=certango
-POSTGRES_USER=certango
-POSTGRES_PASSWORD=certango
+POSTGRES_HOST="postgres"
+POSTGRES_PORT="5432"
+POSTGRES_DB="certango"
+POSTGRES_USER="certango"
+POSTGRES_PASSWORD="certango"
 DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}/${POSTGRES_DB}"

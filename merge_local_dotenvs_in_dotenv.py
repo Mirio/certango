@@ -19,6 +19,10 @@ def merge(
     for merge_file in files_to_merge:
         merged_content += merge_file.read_text()
         merged_content += os.linesep
+    # Replace postgres host for local debug
+    merged_content = merged_content.replace(
+        'POSTGRES_HOST="postgres"', 'POSTGRES_HOST="127.0.0.1"'
+    )
     output_file.write_text(merged_content)
 
 

@@ -11,11 +11,7 @@ from django.urls import reverse
 from certango.users.forms import UserAdminChangeForm
 from certango.users.models import User
 from certango.users.tests.factories import UserFactory
-from certango.users.views import (
-    UserRedirectView,
-    UserUpdateView,
-    user_detail_view,
-)
+from certango.users.views import UserRedirectView, UserUpdateView, user_detail_view
 
 pytestmark = pytest.mark.django_db
 

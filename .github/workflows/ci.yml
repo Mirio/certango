@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Start Postgres
-        run:  docker-compose -f local.yml up postgres -d
+        run:  docker-compose -f local.yml up -d postgres
 
       - name: debug
         run: env && netstat -antp

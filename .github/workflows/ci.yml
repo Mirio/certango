@@ -57,7 +57,7 @@ jobs:
       - name: Install Deps
         run: pip install -r requirements/local.txt
 
-      - name: Run DB Migrations
+      - name: Run Formatter
         run:  black --check .
 
   testing-linting-scanning:

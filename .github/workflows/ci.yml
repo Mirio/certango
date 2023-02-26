@@ -38,7 +38,7 @@ jobs:
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.0
 
-  pytest:
+  testing-scanning:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: "postgres://certango:certango@127.0.0.1/certango"
@@ -64,27 +64,11 @@ jobs:
       - name: Run DB Migrations
         run:  python manage.py migrate
 
-      - name: Run Django Tests
-        run:  pytest
+      - name: Run Django Tests and generate coverage
+        run: tox -e py
 
-      - name: Tear down the Stack
-        run:  docker-compose -f local.yml down
-
-#  sonarcloud:
-#    runs-on: ubuntu-latest
-#    steps:
-#    - uses: actions/checkout@v2
-#      with:
-#        fetch-depth: 0
-#
-#    - name: Build the Stack
-#      run:  docker-compose -f local.yml build
-#
-#    - name: Run Django Tests
-#      run:  docker-compose -f local.yml run django
-#
-#    - name: SonarCloud Scan
-#      uses: sonarsource/sonarcloud-github-action@master
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

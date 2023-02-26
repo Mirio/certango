@@ -42,15 +42,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: "postgres://certango:certango@127.0.0.1/certango"
+      USE_DOCKER: yes
+      IPYTHONDIR: /app/.ipython
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v3
 
       - name: Start Postgres
         run:  docker-compose -f local.yml up -d postgres
-
-      - name: debug
-        run: env && netstat -antp
 
       - name: Set up Python
         uses: actions/setup-python@v4

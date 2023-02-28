@@ -18,31 +18,9 @@ concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-permissions:
-  pull-requests: read
-
 jobs:
-  pre-commit:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code Repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-          cache: pip
-          cache-dependency-path: "requirements/local.txt"
-
-      - name: Install Deps
-        run: pip install -r requirements/local.txt
-
-      - name: Run pre-commit
-        uses: pre-commit/action@v3.0.0
-
   check-formatter:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v3
@@ -63,8 +41,29 @@ jobs:
       - name: Run Formatter
         run:  black --check .
 
+  pre-commit:
+    runs-on: ubuntu-22.04
+    needs: check-formatter
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: "requirements/local.txt"
+
+      - name: Install Deps
+        run: pip install -r requirements/local.txt
+
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.0
+
   testing-linting-scanning:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    needs: [check-formatter, pre-commit]
     env:
       DATABASE_URL: "postgres://certango:certango@127.0.0.1/certango"
       USE_DOCKER: yes

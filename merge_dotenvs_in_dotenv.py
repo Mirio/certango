@@ -1,7 +1,7 @@
+import argparse
 import os
 from collections.abc import Sequence
 from pathlib import Path
-from sys import argv, exit
 
 BASE_DIR = Path(__file__).parent.resolve()
 LOCAL_DOTENVS_DIR = BASE_DIR / ".envs" / ".local"
@@ -32,11 +32,22 @@ def merge(
     output_file.write_text(merged_content)
 
 
-if __name__ == "__main__":
-    if len(argv) != 2:
-        print("Please pass 'local' or 'prod' argument")
-        exit(1)
-    if argv[1] == "local":
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-e",
+        dest="env",
+        required=True,
+        choices=["local", "prod"],
+        help="Select the environment to configure (local/prod)",
+    )
+    args = parser.parse_args(argv)
+    print("Generating '%s' env file" % args.env)
+    if args.env == "local":
         merge(DOTENV_FILE, LOCAL_DOTENV_FILES)
-    elif argv[1] == "prod":
+    elif args.env == "prod":
         merge(DOTENV_FILE, PRODUCTION_DOTENV_FILES)
+
+
+if __name__ == "__main__":
+    main()

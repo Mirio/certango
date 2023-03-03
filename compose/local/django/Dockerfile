@@ -1,69 +1,36 @@
-ARG PYTHON_VERSION=3.10-slim-bullseye
+FROM docker.io/alpine:3.17
 
-# define an alias for the specfic python version used in this file.
-FROM python:${PYTHON_VERSION} as python
+ENV USER_UID "1000"
+ENV USER_GID "1000"
+ENV USER_NAME "certargo"
+ENV USER_HOME "/home/${USER_NAME}"
+ENV BUILD_ENVIRONMENT "local"
+ENV BUILD_ENV "${BUILD_ENVIRONMENT}"
 
-# Python build stage
-FROM python as python-build-stage
+USER 0
+RUN apk add --no-cache alpine-sdk bash gettext libpq-dev py3-virtualenv python3-dev tzdata \
+    && addgroup -g "${USER_GID}" "${USER_NAME}" && adduser -G "${USER_NAME}" -u "${USER_UID}" -D "${USER_NAME}"
 
-ARG BUILD_ENVIRONMENT=local
-
-# Install apt packages
-RUN apt-get update && apt-get install --no-install-recommends -y \
-  # dependencies for building Python packages
-  build-essential \
-  # psycopg2 dependencies
-  libpq-dev
-
-# Requirements are installed here to ensure they will be cached.
-COPY ./requirements .
-
-# Create Python Dependency and Sub-Dependency Wheels.
-RUN pip wheel --wheel-dir /usr/src/app/wheels  \
-  -r ${BUILD_ENVIRONMENT}.txt
-
-
-# Python 'run' stage
-FROM python as python-run-stage
-
-ARG BUILD_ENVIRONMENT=local
-ARG APP_HOME=/app
+USER "${USER_UID}"
+WORKDIR "/home/${USER_NAME}"
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV BUILD_ENV ${BUILD_ENVIRONMENT}
 
-WORKDIR ${APP_HOME}
+COPY --chown="${USER_UID}":"${USER_UID}" "*.py" "LICENSE" "setup.cfg" "${USER_HOME}"
+COPY --chown="${USER_UID}":"${USER_UID}" "./requirements" "${USER_HOME}/requirements"
+COPY --chown="${USER_UID}":"${USER_UID}" "./certango" "${USER_HOME}/certango"
+COPY --chown="${USER_UID}":"${USER_UID}" "./config" "${USER_HOME}/config"
+COPY --chown="${USER_UID}":"${USER_UID}" "./tests" "${USER_HOME}/tests"
+COPY --chown="${USER_UID}":"${USER_UID}" "./locale" "${USER_HOME}/locale"
+COPY --chown="${USER_UID}":"${USER_UID}" "./compose/local/django/start.bash" "${USER_HOME}/start.bash"
 
-# Install required system dependencies
-RUN apt-get update && apt-get install --no-install-recommends -y \
-  # psycopg2 dependencies
-  libpq-dev \
-  # Translations dependencies
-  gettext \
-  # cleaning up unused files
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-  && rm -rf /var/lib/apt/lists/*
+RUN python3 -m venv "${USER_HOME}/.venv" && source "${USER_HOME}/.venv/bin/activate" \
+    && pip install --upgrade pip && pip install --no-cache-dir -r "${USER_HOME}/requirements/${BUILD_ENVIRONMENT}.txt" \
+    && rm -rf "${USER_HOME}/.cache" && chmod +x "${USER_HOME}/start.bash"
 
-# All absolute dir copies ignore workdir instruction. All relative dir copies are wrt to the workdir instruction
-# copy python dependency wheels from python-build-stage
-COPY --from=python-build-stage /usr/src/app/wheels  /wheels/
+VOLUME ["/data"]
+EXPOSE 8000
 
-# use wheels to install python dependencies
-RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-	&& rm -rf /wheels/
-
-COPY ./compose/production/django/entrypoint /entrypoint
-RUN sed -i 's/\r$//g' /entrypoint
-RUN chmod +x /entrypoint
-
-COPY ./compose/local/django/start /start
-RUN sed -i 's/\r$//g' /start
-RUN chmod +x /start
-
-
-
-# copy application code to WORKDIR
-COPY . ${APP_HOME}
-
-ENTRYPOINT ["/entrypoint"]
+CMD ["./start.bash"]

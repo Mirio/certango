@@ -11,4 +11,6 @@ def media_storage(settings, tmpdir):
 
 @pytest.fixture
 def user(db) -> User:
+    # pylint: disable=unused-argument
+    # 'db' used during the Factory class
     return UserFactory()

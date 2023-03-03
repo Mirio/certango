@@ -1,3 +1,5 @@
+import secrets
+
 from django.urls import reverse
 
 from certango.users.models import User
@@ -17,14 +19,15 @@ class TestUserAdmin:
     def test_add(self, admin_client):
         url = reverse("admin:users_user_add")
         response = admin_client.get(url)
+        random_pwd = secrets.token_urlsafe(20)
         assert response.status_code == 200
 
         response = admin_client.post(
             url,
             data={
                 "username": "test",
-                "password1": "My_R@ndom-P@ssw0rd",
-                "password2": "My_R@ndom-P@ssw0rd",
+                "password1": random_pwd,
+                "password2": random_pwd,
             },
         )
         assert response.status_code == 302

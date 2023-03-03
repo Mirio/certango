@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from merge_local_dotenvs_in_dotenv import merge
+from merge_dotenvs_in_dotenv import main, merge
 
 
 @pytest.mark.parametrize(
@@ -32,3 +32,21 @@ def test_merge(
     merge(output_file, files_to_merge)
 
     assert output_file.read_text() == expected_output
+
+
+def test_main_local_args(capsys):
+    main(["-e", "local"])
+    captured = capsys.readouterr()
+    assert "Generating 'local'" in captured.out
+
+
+def test_main_prod_args(capsys):
+    main(["-e", "prod"])
+    captured = capsys.readouterr()
+    assert "Generating 'prod'" in captured.out
+
+
+def test_main_noargs():
+    with pytest.raises(SystemExit) as e:
+        main(["-e", "aaa"])
+    assert e.type == SystemExit

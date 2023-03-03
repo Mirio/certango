@@ -46,7 +46,7 @@ def test_main_prod_args(capsys):
     assert "Generating 'prod'" in captured.out
 
 
-def test_main_noargs(capsys):
+def test_main_noargs():
     with pytest.raises(SystemExit) as e:
         main(["-e", "aaa"])
     assert e.type == SystemExit

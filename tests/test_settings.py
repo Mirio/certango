@@ -17,8 +17,8 @@ def test_settings_allowedhost():
 
 
 def test_settings_cache():
-    assert "default" in local.CACHES.keys()
-    assert "default" in production.CACHES.keys()
+    assert "default" in local.CACHES
+    assert "default" in production.CACHES
 
 
 def test_settings_installedapps():

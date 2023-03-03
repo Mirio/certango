@@ -12,6 +12,7 @@ Manage your certificates in a simple webui interface
 | Security Grade | A | [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Mirio_certango&metric=security_rating)](https://sonarcloud.io/summary/overall?id=Mirio_certango) |
 | Number of Bugs | <= 10 | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Mirio_certango&metric=bugs)](https://sonarcloud.io/summary/overall?id=Mirio_certango) |
 | Number of Vulnerabilities | <= 10 | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Mirio_certango&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Mirio_certango) |
+| CodeQL Gate | Passed | ![Quality Gate Status](https://github.com/Mirio/certango/workflows/CodeQL/badge.svg) |
 
 # License
 [Apache Software License 2.0](LICENSE)

@@ -26,7 +26,6 @@ concurrency:
 jobs:
   analyze:
     runs-on: ubuntu-22.04
-    needs: [check-formatter, pre-commit]
     env:
       DATABASE_URL: "postgres://certango:certango@127.0.0.1/certango"
       USE_DOCKER: yes

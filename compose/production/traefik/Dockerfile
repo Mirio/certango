@@ -5,4 +5,5 @@ RUN mkdir -p /etc/traefik/acme \
   && adduser -s /bin/false -D -H traefik
 COPY ./compose/production/traefik/traefik.yml /etc/traefik
 
+USER traefik
 EXPOSE 8080 8443
